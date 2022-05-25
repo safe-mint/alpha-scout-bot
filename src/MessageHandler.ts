@@ -1,11 +1,11 @@
-
+import { Airtabler } from './Airtabler'
 
 export class MessageHandler {
   
   constructor() {
-    this.error = MessageHandler.ERROR.NONE;
+    this.status = MessageHandler.STATUS.NONE;
   }
-  error: MessageHandler.ERROR;
+  status: MessageHandler.STATUS;
 
   splitMessage(message: string) : string[] {
     let split = message.split(',')
@@ -14,33 +14,45 @@ export class MessageHandler {
     return [twitterLink, launchDate]
   }
 
+
+
   async handle(message: string, author: string) {
     const [twitterLink, launchDate] = this.splitMessage(message)
 
     if (!launchDate) {
-      this.error = MessageHandler.ERROR.NO_LAUNCH_DATE; 
-      return this.error;
+      this.status = MessageHandler.STATUS.NO_LAUNCH_DATE; 
+      return this.status;
     }
 
     if (!twitterLink.startsWith("https://twitter.com/")) {
-      this.error = MessageHandler.ERROR.BAD_TWITTER_LINK;
-      return this.error
+      this.status = MessageHandler.STATUS.BAD_TWITTER_LINK;
+      return this.status
     }
 
-    // const records = await findRecord(twitterLink)
-    // console.log(records)
-    // console.log(records!.length)
-    // if(records!.length > 0) {
-    //   return MESSAGE.DUPLICATE_RECORD
-    // }
-    // createRecord(twitterLink, launchDate, author)
-    // return MESSAGE.DB_SUCCESS
+    if (await this.doesRecordExist(twitterLink)) {
+      this.status = MessageHandler.STATUS.DUPLICATE_RECORD;
+      return this.status   
+    }
+    const airtabler = new Airtabler()
+    airtabler.createRecord(twitterLink, launchDate, author)
+    return MessageHandler.STATUS.DB_SUCCESS;
+
+  }
+
+  async doesRecordExist(twitterLink:string) : Promise<boolean> {
+    const airtabler = new Airtabler()
+    const records = await airtabler.findRecord(twitterLink)
+    if (records && records.length > 0) {
+      return true
+    }
+    return false
   }
 }
 
+
 export namespace MessageHandler
 {
-  export enum ERROR
+  export enum STATUS
   {
     NONE = 0,
     NO_LAUNCH_DATE,
