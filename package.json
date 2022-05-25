@@ -1,0 +1,25 @@
+{
+  "name": "alpha-spam",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --require ts-node/register --watch-extensions ts 'test/**/*.ts'"
+  },
+  "keywords": [],
+  "author": "_safeMint",
+  "license": "ISC",
+  "dependencies": {
+    "airtable": "^0.11.4",
+    "discord.js": "^13.7.0",
+    "dotenv": "^16.0.1",
+    "googleapis": "^39.2.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.1",
+    "@types/mocha": "^9.1.1",
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0",
+    "ts-node": "^10.8.0"
+  }
+}
