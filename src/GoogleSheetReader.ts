@@ -26,7 +26,7 @@ export class GoogleSheetReader {
       spreadsheetId, // spreadsheet id
       range: `${SHEET_NAME}!C:C`, //range of cells to read from.
     })
-    const values = readData?.data?.values?.map(x => x[0])
+    const values = readData?.data?.values?.map(x => x[0]?.trim()?.toLowerCase())
     return values
   }
 }

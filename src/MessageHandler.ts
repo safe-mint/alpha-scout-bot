@@ -1,4 +1,5 @@
 import { Airtabler } from './Airtabler'
+import { GoogleSheetReader } from './GoogleSheetReader';
 
 export class MessageHandler {
   
@@ -9,7 +10,7 @@ export class MessageHandler {
 
   splitMessage(message: string) : string[] {
     let split = message.split(',')
-    const twitterLink = split[0]?.trim()
+    const twitterLink = split[0]?.trim()?.toLowerCase()
     const launchDate = split[1]?.trim()
     return [twitterLink, launchDate]
   }
@@ -52,6 +53,12 @@ export class MessageHandler {
     const airtabler = new Airtabler()
     const records = await airtabler.findRecord(twitterLink)
     if (records && records.length > 0) {
+      return true
+    }
+    const reader = new GoogleSheetReader()
+    const sheetEntries = await reader.readData()
+    console.log(sheetEntries)
+    if( sheetEntries?.includes(twitterLink) ) {
       return true
     }
     return false

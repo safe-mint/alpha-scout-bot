@@ -7,9 +7,14 @@ const AIRTABLE_TABLE_NAME = "Alpha Scout"
 var base = new Airtable({apiKey: AIRTABLE_API_KEY}).base(AIRTABLE_BASE!);
 
 export class Airtabler {
+  tableName: string
+
+  constructor(tableName = AIRTABLE_TABLE_NAME) {
+    this.tableName = tableName
+  }
 
   async createRecord(twitterLink:string, launchDate:string, author:string) : Promise<Records<FieldSet> | undefined> {
-    const records = await base(AIRTABLE_TABLE_NAME).create([
+    const records = await base(this.tableName).create([
       {
         "fields": {
           "Twitter Link": twitterLink,
@@ -23,7 +28,7 @@ export class Airtabler {
 
   findRecord(twitterLink:string) : Promise<Records<FieldSet> | undefined> {
     return new Promise((resolve, reject) => {
-      base(AIRTABLE_TABLE_NAME).select({
+      base(this.tableName).select({
         view: 'Grid view',
         filterByFormula: `({Twitter Link} = '${twitterLink}')`
       }).firstPage(function(err, records) {
