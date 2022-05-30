@@ -8,9 +8,8 @@ var base = new Airtable({apiKey: AIRTABLE_API_KEY}).base(AIRTABLE_BASE!);
 
 export class Airtabler {
 
-  createRecord(twitterLink:string, launchDate:string, author:string) {
-    console.log("createRecord()")
-    base(AIRTABLE_TABLE_NAME).create([
+  async createRecord(twitterLink:string, launchDate:string, author:string) : Promise<Records<FieldSet> | undefined> {
+    const records = await base(AIRTABLE_TABLE_NAME).create([
       {
         "fields": {
           "Twitter Link": twitterLink,
@@ -18,15 +17,8 @@ export class Airtabler {
           "Launch Date": launchDate
         }
       },
-    ], function(err, records) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      records?.forEach(function (record) {
-        console.log(record.getId());
-      });
-    });
+    ])
+    return records
   }
 
   findRecord(twitterLink:string) : Promise<Records<FieldSet> | undefined> {

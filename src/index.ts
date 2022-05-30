@@ -1,12 +1,5 @@
 import DiscordJS, { Intents } from 'discord.js'
-
-
 import { MessageHandler } from './MessageHandler'
-
-
-
-
-
 
 
 
@@ -17,9 +10,6 @@ const client = new DiscordJS.Client({
   ]
 })
 
-
-// const r = findRecord("https://twitter.com/a_new_nft_project")
-// r.then((records) => console.log(records))
 
 client.on("ready", () => {
   console.log("the bot is ready")
@@ -34,7 +24,6 @@ const INVALID_FORMAT = `invalid format: please use \n[twitter_link],[launch date
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
-  //console.log(message.author)
   const handler = new MessageHandler()
   const result = await handler.handle(message.content, messageUsername(message))
   if (result === MessageHandler.STATUS.NO_LAUNCH_DATE) {
@@ -45,6 +34,8 @@ client.on('messageCreate', async (message) => {
     message.reply({ content: "thank you! successfully saved" })
   } else if (result === MessageHandler.STATUS.DUPLICATE_RECORD) {
     message.reply({ content: "that NFT project has already been added"})
+  } else if (result == MessageHandler.STATUS.DB_SAVING_ERROR) {
+    message.reply({ content: "ERROR saving to the database, please contact admin"})
   }
 
 })

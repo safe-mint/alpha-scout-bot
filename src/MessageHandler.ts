@@ -20,22 +20,31 @@ export class MessageHandler {
     const [twitterLink, launchDate] = this.splitMessage(message)
 
     if (!launchDate) {
-      this.status = MessageHandler.STATUS.NO_LAUNCH_DATE; 
+      this.status = MessageHandler.STATUS.NO_LAUNCH_DATE
       return this.status;
     }
 
     if (!twitterLink.startsWith("https://twitter.com/")) {
-      this.status = MessageHandler.STATUS.BAD_TWITTER_LINK;
+      this.status = MessageHandler.STATUS.BAD_TWITTER_LINK
       return this.status
     }
 
     if (await this.doesRecordExist(twitterLink)) {
-      this.status = MessageHandler.STATUS.DUPLICATE_RECORD;
+      this.status = MessageHandler.STATUS.DUPLICATE_RECORD
       return this.status   
     }
     const airtabler = new Airtabler()
-    airtabler.createRecord(twitterLink, launchDate, author)
-    return MessageHandler.STATUS.DB_SUCCESS;
+    try {
+      const records = await airtabler.createRecord(twitterLink, launchDate, author)
+      if(records && records.length > 0) {
+        return MessageHandler.STATUS.DB_SUCCESS
+      }
+    } catch (err) {
+      console.log('error saving to DB')
+      console.log(err)
+      return MessageHandler.STATUS.DB_SAVING_ERROR
+    }
+    
 
   }
 
@@ -58,6 +67,7 @@ export namespace MessageHandler
     NO_LAUNCH_DATE,
     BAD_TWITTER_LINK,
     DB_SUCCESS,
-    DUPLICATE_RECORD
+    DUPLICATE_RECORD,
+    DB_SAVING_ERROR
   }
 }
