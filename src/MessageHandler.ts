@@ -41,8 +41,10 @@ export class MessageHandler {
         return MessageHandler.STATUS.DB_SUCCESS
       }
     } catch (err) {
-      console.log('error saving to DB')
-      console.log(err)
+      if (process.env.NODE_ENV !== 'test') {
+        console.log('error saving to DB')
+        console.log(err)
+      }
       return MessageHandler.STATUS.DB_SAVING_ERROR
     }
     

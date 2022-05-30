@@ -1,6 +1,8 @@
 import {MessageHandler} from '../src/MessageHandler'
 import {expect} from 'chai'
 import {faker} from '@faker-js/faker'
+import sinon from 'sinon'
+import {Airtabler} from '../src/Airtabler'
 
 const DUPLICATE_TWITTER_LINK = "https://twitter.com/a_new_nft_project44"
 
@@ -42,6 +44,13 @@ describe('MessageHandler', () => {
       const str = `${twitterLink}, 2022`
       const result = await handler.handle(str, author)
       expect(result).to.eq(MessageHandler.STATUS.DB_SUCCESS)
+    })
+    it("DB_SAVING_ERROR", async () => {
+      sinon.stub(Airtabler.prototype, 'createRecord').callsFake( () => { throw Error("intentionally generated TEST Error") })
+      const twitterLink = "https://twitter.com/" + faker.random.words(6).replace(' ', '-')
+      const str = `${twitterLink}, 2022`
+      const result = await handler.handle(str, author)
+      expect(result).to.eq(MessageHandler.STATUS.DB_SAVING_ERROR)
     })
     
   })
