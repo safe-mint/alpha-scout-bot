@@ -1,13 +1,12 @@
 import {Airtabler} from '../src/Airtabler'
 import {expect} from 'chai'
-import dotenv from 'dotenv'
-dotenv.config()
 
+const TWITTER_LINK_RECORD = "https://twitter.com/a_new_nft_project44"
 
 describe('Airtabler', async () => {
   it('#createRecord', async () => {
-    const airtabler = new Airtabler("Alpha Scout (test)")
-    const twitterLink = "https://twitter.com/a_new_nft_project44"
+    const airtabler = new Airtabler()
+    const twitterLink = TWITTER_LINK_RECORD
     const launchDate = "March 2023"
     const author = "mintyMcMintable#9999"
     const records = await airtabler.createRecord(twitterLink, launchDate, author)
@@ -19,8 +18,8 @@ describe('Airtabler', async () => {
   })
 
   it('#findRecord', async () => {
-    const airtabler = new Airtabler("Alpha Scout (test)")
-    const twitterLink = "https://twitter.com/a_new_nft_project44"
+    const airtabler = new Airtabler()
+    const twitterLink = TWITTER_LINK_RECORD
     const records = await airtabler.findRecord(twitterLink)
     expect(records!.length).to.be.greaterThan(1)
     expect(records![0].fields["Twitter Link"]).to.eq(twitterLink)

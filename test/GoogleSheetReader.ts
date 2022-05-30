@@ -1,7 +1,5 @@
 import {GoogleSheetReader} from '../src/GoogleSheetReader'
 import {expect} from 'chai'
-import dotenv from 'dotenv'
-dotenv.config()
 
 
 describe('GoogleSheetReader', async () => {

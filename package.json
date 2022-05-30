@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --require ts-node/register --watch-extensions ts 'test/**/*.ts'"
+    "dev": "ts-node --require dotenv/config src/index.ts",
+    "test": "DOTENV_CONFIG_PATH=.env.test mocha --require dotenv/config . --require ts-node/register --watch-extensions ts 'test/**/*.ts'"
   },
   "keywords": [],
   "author": "_safeMint",
@@ -16,6 +17,7 @@
     "googleapis": "^39.2.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.1.0",
     "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.1",
     "chai": "^4.3.6",

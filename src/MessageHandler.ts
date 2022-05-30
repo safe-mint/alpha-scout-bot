@@ -56,9 +56,9 @@ export class MessageHandler {
       return true
     }
     const reader = new GoogleSheetReader()
+    const lowerCaseTwitter = twitterLink.toLowerCase()
     const sheetEntries = await reader.readData()
-    console.log(sheetEntries)
-    if( sheetEntries?.includes(twitterLink) ) {
+    if( sheetEntries?.includes(lowerCaseTwitter) ) {
       return true
     }
     return false
