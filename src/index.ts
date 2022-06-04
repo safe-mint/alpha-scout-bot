@@ -17,17 +17,14 @@ function messageUsername(message:DiscordJS.Message<boolean>) {
   return message.author.username + "#" + message.author.discriminator
 }
 
-const EXAMPLES = "for example\nhttps://twitter.com/a_new_nft_project , Q3\nor\nhttps://twitter.com/a_new_nft_project , April 17, 2020"
-const INVALID_FORMAT = `invalid format: please use \n[twitter_link],[launch date]\n${EXAMPLES}`
+const EXAMPLES = "for example\nhttps://twitter.com/ChunkyChihuahuas\nor\nhttps://mobile.twitter.com/GrumpyGremplins\n\nif you know the estimated launch date, you can add it after the twitter link, like \nhttps://mobile.twitter.com/PuffyPandas September 14, 2023"
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
   const handler = new MessageHandler()
   const result = await handler.handle(message.content, messageUsername(message))
-  if (result === MessageHandler.STATUS.NO_LAUNCH_DATE) {
-    message.reply({ content: INVALID_FORMAT })
-  } else if (result == MessageHandler.STATUS.BAD_TWITTER_LINK) {
-    message.reply({ content: `invalid format: first parameter should be Twitter link (i.e. it should start with https://www.twitter.com/)\n${EXAMPLES}`})
+  if (result == MessageHandler.STATUS.BAD_TWITTER_LINK) {
+    message.reply({ content: `invalid format: please start with a Twitter link (i.e. it should start with https://www.twitter.com/)\n${EXAMPLES}`})
   } else if (result === MessageHandler.STATUS.DB_SUCCESS) {
     message.reply({ content: "thank you! successfully saved" })
   } else if (result === MessageHandler.STATUS.DUPLICATE_RECORD) {

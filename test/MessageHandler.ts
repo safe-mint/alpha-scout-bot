@@ -54,59 +54,65 @@ describe('MessageHandler', () => {
       handler = new MessageHandler()
     })
     it("BAD_TWITTER_LINK", async () => {
-      const str = "moonbirds, 2022"
+      const str = "moonbirds 2022"
       const result = await handler.handle(str, author)
       expect(result).to.eq(MessageHandler.STATUS.BAD_TWITTER_LINK)
     })
     it("DUPLICATE_RECORD", async () => {
-      const str = `${DUPLICATE_TWITTER_LINK}, 2022`
+      const str = `${DUPLICATE_TWITTER_LINK} 2022`
       const result = await handler.handle(str, author)
       expect(result).to.eq(MessageHandler.STATUS.DUPLICATE_RECORD)
     })
     it("DB_SUCCESS", async () => {
       const twitterLink = "https://twitter.com/" + faker.random.words(6).replace(' ', '-')
-      const str = `${twitterLink}, 2022`
+      const str = `${twitterLink} 2022`
       const result = await handler.handle(str, author)
       expect(result).to.eq(MessageHandler.STATUS.DB_SUCCESS)
     })
     it("DB_SAVING_ERROR", async () => {
       sinon.stub(Airtabler.prototype, 'createRecord').callsFake( () => { throw Error("intentionally generated TEST Error") })
       const twitterLink = "https://twitter.com/" + faker.random.words(6).replace(' ', '-')
-      const str = `${twitterLink}, 2022`
+      const str = `${twitterLink} 2022`
       const result = await handler.handle(str, author)
       expect(result).to.eq(MessageHandler.STATUS.DB_SAVING_ERROR)
     })
     
   })
 
-  describe("#parseMessage", () => {
+  describe.only("#parseMessage", () => {
     let handler:MessageHandler
     before( () => {
       handler = new MessageHandler()
     })
-    it('#splitMessage expected', () => {
-      const message = "https://twitter.com/moonbirds,2022"
+    it('#expected', () => {
+      const message = "https://twitter.com/moonbirds 2022"
       const [twitterLink, launchDate] = handler.parseMessage(message)
       expect(twitterLink).to.eq("https://twitter.com/moonbirds")
       expect(launchDate).to.eq('2022')
     })
-    it('#splitMessage extra spaces', () => {
-      const message = "   https://twitter.com/moonbirds  ,   2022 "
+    it('#extra spaces', () => {
+      const message = "   https://twitter.com/moonbirds      2022 "
       const [twitterLink, launchDate] = handler.parseMessage(message)
       expect(twitterLink).to.eq("https://twitter.com/moonbirds")
       expect(launchDate).to.eq('2022')   
     })
-    it('#splitMessage no launch date', () => {
+    it('#no launch date', () => {
       const message = "https://twitter.com/moonbirds"
       const [twitterLink, launchDate] = handler.parseMessage(message)
       expect(twitterLink).to.eq("https://twitter.com/moonbirds")
       expect(launchDate).to.eq(undefined)   
     })
-    it('#splitMessage garbage input', () => {
+    it('#garbage input', () => {
       const message = "thisisgarbage!@#"
       const [twitterLink, launchDate] = handler.parseMessage(message)
       expect(twitterLink).to.eq(message)
       expect(launchDate).to.eq(undefined)   
+    })
+    it('#splitMessage long launch date', () => {
+      const message = "https://twitter.com/moonbirds April 15, 2023"
+      const [twitterLink, launchDate] = handler.parseMessage(message)
+      expect(twitterLink).to.eq("https://twitter.com/moonbirds")
+      expect(launchDate).to.eq("April 15, 2023")   
     })
   })
 

@@ -9,7 +9,7 @@ export class MessageHandler {
   status: MessageHandler.STATUS;
 
   parseMessage(message: string) : string[] {
-    const split = message.split(',')
+    const split = message.trim().split(/ (.*)/s) // split only on the first space
     const twitterLink = split[0]?.trim()
     const launchDate = split[1]?.trim()
     return [twitterLink, launchDate]
