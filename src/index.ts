@@ -17,7 +17,7 @@ function messageUsername(message:DiscordJS.Message<boolean>) {
   return message.author.username + "#" + message.author.discriminator
 }
 
-const EXAMPLES = "for example\nhttps://twitter.com/ChunkyChihuahuas\nor\nhttps://mobile.twitter.com/GrumpyGremplins\n\nIf you know the estimated launch date, you can add it after the twitter link, like \nhttps://mobile.twitter.com/PuffyPandas September 14, 2023\nor\nhttps://mobile.twitter.com/OrangeOtters Q3 2023"
+const EXAMPLES = "for example\nhttps://twitter.com/ChunkyChihuahuas\nor\nhttps://mobile.twitter.com/GrumpyGremplins\n\nIf you know the estimated launch date, you can add it after the twitter link, like \nhttps://mobile.twitter.com/PuffyPandas September 14, 2023\nor\nhttps://twitter.com/OrangeOttersXYZ Q3 2023"
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
