@@ -79,40 +79,46 @@ describe('MessageHandler', () => {
     
   })
 
-  describe.only("#parseMessage", () => {
+  describe("#parseMessage", () => {
     let handler:MessageHandler
     before( () => {
       handler = new MessageHandler()
     })
-    it('#expected', () => {
+    it('happy path', () => {
       const message = "https://twitter.com/moonbirds 2022"
       const [twitterLink, launchDate] = handler.parseMessage(message)
       expect(twitterLink).to.eq("https://twitter.com/moonbirds")
       expect(launchDate).to.eq('2022')
     })
-    it('#extra spaces', () => {
+    it('extra spaces', () => {
       const message = "   https://twitter.com/moonbirds      2022 "
       const [twitterLink, launchDate] = handler.parseMessage(message)
       expect(twitterLink).to.eq("https://twitter.com/moonbirds")
       expect(launchDate).to.eq('2022')   
     })
-    it('#no launch date', () => {
+    it('no launch date', () => {
       const message = "https://twitter.com/moonbirds"
       const [twitterLink, launchDate] = handler.parseMessage(message)
       expect(twitterLink).to.eq("https://twitter.com/moonbirds")
       expect(launchDate).to.eq(undefined)   
     })
-    it('#garbage input', () => {
+    it('garbage input', () => {
       const message = "thisisgarbage!@#"
       const [twitterLink, launchDate] = handler.parseMessage(message)
       expect(twitterLink).to.eq(message)
       expect(launchDate).to.eq(undefined)   
     })
-    it('#splitMessage long launch date', () => {
+    it('long launch date', () => {
       const message = "https://twitter.com/moonbirds April 15, 2023"
       const [twitterLink, launchDate] = handler.parseMessage(message)
       expect(twitterLink).to.eq("https://twitter.com/moonbirds")
       expect(launchDate).to.eq("April 15, 2023")   
+    })
+    it('delimited with comma and space', () => {
+      const message = "https://twitter.com/moonbirds, 2023"
+      const [twitterLink, launchDate] = handler.parseMessage(message)
+      expect(twitterLink).to.eq("https://twitter.com/moonbirds")
+      expect(launchDate).to.eq("2023")   
     })
   })
 

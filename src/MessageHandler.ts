@@ -10,7 +10,7 @@ export class MessageHandler {
 
   parseMessage(message: string) : string[] {
     const split = message.trim().split(/ (.*)/s) // split only on the first space
-    const twitterLink = split[0]?.trim()
+    const twitterLink = split[0]?.trim().replace(/\,$/, '') // if ends in a comma, delete comma
     const launchDate = split[1]?.trim()
     return [twitterLink, launchDate]
   }
