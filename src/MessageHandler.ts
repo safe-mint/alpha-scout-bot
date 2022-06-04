@@ -8,24 +8,43 @@ export class MessageHandler {
   }
   status: MessageHandler.STATUS;
 
-  splitMessage(message: string) : string[] {
-    let split = message.split(',')
-    const twitterLink = split[0]?.trim()?.toLowerCase()
+  parseMessage(message: string) : string[] {
+    const split = message.split(',')
+    const twitterLink = split[0]?.trim()
     const launchDate = split[1]?.trim()
     return [twitterLink, launchDate]
   }
 
 
-
-  async handle(message: string, author: string) {
-    const [twitterLink, launchDate] = this.splitMessage(message)
-
-    if (!launchDate) {
-      this.status = MessageHandler.STATUS.NO_LAUNCH_DATE
-      return this.status;
+  convertTwitterToValidLink(twitterMessage: string) : string | undefined {
+    const split = twitterMessage.split('?')
+    let twitterLink = split[0]?.trim() // remove query string
+    if (twitterLink.startsWith("https://")) {
+      twitterLink = twitterLink.replace("https://", "")
+    } else if (twitterLink.startsWith("http://")) {
+      twitterLink = twitterLink.replace("http://", "")
     }
 
-    if (!twitterLink.startsWith("https://twitter.com/")) {
+    if (twitterLink.startsWith("mobile.twitter.com")) {
+      twitterLink = twitterLink.replace("mobile.", "")
+    } else if (twitterLink.startsWith("www.twitter.com")) {
+      twitterLink = twitterLink.replace("www.", "")
+    }
+
+    if (!twitterLink.startsWith("twitter.com/")) {
+      return
+    }
+    return `https://${twitterLink}`
+  }
+
+
+
+  async handle(message: string, author: string) {
+    const [twitterPart, launchDate] = this.parseMessage(message) 
+
+    const twitterLink = this.convertTwitterToValidLink(twitterPart)
+
+    if(!twitterLink) {
       this.status = MessageHandler.STATUS.BAD_TWITTER_LINK
       return this.status
     }
@@ -73,7 +92,6 @@ export namespace MessageHandler
   export enum STATUS
   {
     NONE = 0,
-    NO_LAUNCH_DATE,
     BAD_TWITTER_LINK,
     DB_SUCCESS,
     DUPLICATE_RECORD,

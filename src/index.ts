@@ -1,8 +1,6 @@
 import DiscordJS, { Intents } from 'discord.js'
 import { MessageHandler } from './MessageHandler'
 
-
-
 const client = new DiscordJS.Client({
   intents: [
     Intents.FLAGS.GUILDS,

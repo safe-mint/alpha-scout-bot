@@ -23,7 +23,7 @@ export class Airtabler {
     return new Promise((resolve, reject) => {
       base(AIRTABLE_TABLE_NAME!).select({
         view: 'Grid view',
-        filterByFormula: `({Twitter Link} = '${twitterLink}')`
+        filterByFormula: `(LOWER({Twitter Link}) = '${twitterLink.toLowerCase()}')`
       }).firstPage(function(err, records) {
           if (err) { console.error(err); reject(err); }
           resolve(records)
