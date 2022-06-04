@@ -24,13 +24,13 @@ client.on('messageCreate', async (message) => {
   const handler = new MessageHandler()
   const result = await handler.handle(message.content, messageUsername(message))
   if (result == MessageHandler.STATUS.BAD_TWITTER_LINK) {
-    message.reply({ content: `Invalid Format: Please enter the project Twitter link (i.e. it should start with https://www.twitter.com/)\n${EXAMPLES}`})
+    message.reply({ content: `:x: Invalid Format: Please enter the project Twitter link (i.e. it should start with https://www.twitter.com/)\n${EXAMPLES}`})
   } else if (result === MessageHandler.STATUS.DB_SUCCESS) {
-    message.reply({ content: "Thank You! Successfully Saved" })
+    message.reply({ content: ":white_check_mark: Thank You! Successfully Saved" })
   } else if (result === MessageHandler.STATUS.DUPLICATE_RECORD) {
-    message.reply({ content: "That NFT project has already been added"})
+    message.reply({ content: ":x: That NFT project has already been added"})
   } else if (result == MessageHandler.STATUS.DB_SAVING_ERROR) {
-    message.reply({ content: "ERROR saving to the database, please contact an admin"})
+    message.reply({ content: ":x: ERROR saving to the database, please contact an admin"})
   }
 
 })
