@@ -18,35 +18,6 @@ describe('MessageHandler', () => {
     })
   })
 
-  describe("convertTwitterToValidLink", () => {
-    let handler:MessageHandler
-    const expectedResult = "https://twitter.com/BillyBobNFT"
-    before( () => {
-      handler = new MessageHandler()
-    })
-    it("return correct string", () => {
-      const protocol = ["https://", "http://", ""]
-      const subdomain = ["mobile.", "www.", ""]
-      const queryStr = ["?t=yUnZi2HaVMlwaSGs_Dyzxw&s=09", ""]
-      protocol.forEach(p => {
-        subdomain.forEach(s => {
-          queryStr.forEach(q => {
-            const twitter = `${p}${s}twitter.com/BillyBobNFT${q}`
-            //console.log(twitter)
-            const result = handler.convertTwitterToValidLink(twitter)
-            expect(result).to.eq(expectedResult)
-          })
-        })
-      })
-    })
-
-    it("when string is not twitter.com", () => {
-      expect(handler.convertTwitterToValidLink("boba.com")).to.be.undefined
-      expect(handler.convertTwitterToValidLink("https://bliken.twitter.com?abs")).to.be.undefined
-      expect(handler.convertTwitterToValidLink("mobile.ABCDEFG")).to.be.undefined
-    })
-  })
-
   describe("#handle", () => {
     let handler:MessageHandler
     const author = 'mcMinty'
@@ -79,46 +50,102 @@ describe('MessageHandler', () => {
     
   })
 
-  describe("#parseMessage", () => {
+  describe("#twitterHandleMatch", () => {
+    let handler:MessageHandler
+    let message:string
+    before( () => {
+      handler = new MessageHandler()
+    })  
+    it("upper and lowercase", () => {
+      message = "https://twitter.com/MoonbirdsXYZ" 
+      expect(handler.twitterHandleMatch(message)).to.eq("MoonbirdsXYZ")
+    })
+    it("numbers and underscores", () => {
+      message = "https://twitter.com/_Boonbirds99"
+      expect(handler.twitterHandleMatch(message)).to.eq("_Boonbirds99")
+    })
+    it("http not https", () => {
+      message = "http://twitter.com/MoonbirdsXYZ"
+      expect(handler.twitterHandleMatch(message)).to.eq("MoonbirdsXYZ")
+    })
+    it("has no protocol https", () => {
+      message = "twitter.com/MoonbirdsXYZ"
+      expect(handler.twitterHandleMatch(message)).to.eq("MoonbirdsXYZ")
+    })
+    it("has mobile/www subdomain", () => {
+      message = "mobile.twitter.com/MoonbirdsXYZ"
+      expect(handler.twitterHandleMatch(message)).to.eq("MoonbirdsXYZ")
+      message = "www.twitter.com/MoonbirdsXYZ"
+      expect(handler.twitterHandleMatch(message)).to.eq("MoonbirdsXYZ")
+    })
+    it("has a comma/period/bar delimiter", () => {
+      message = "https://twitter.com/_GoeyGeese1,April 5, 2023"
+      expect(handler.twitterHandleMatch(message)).to.eq("_GoeyGeese1")
+      message = "https://twitter.com/_GoeyGeese1.April 5, 2023"
+      expect(handler.twitterHandleMatch(message)).to.eq("_GoeyGeese1")
+      message = "https://twitter.com/_GoeyGeese1|April 5, 2023"
+      expect(handler.twitterHandleMatch(message)).to.eq("_GoeyGeese1")
+    })
+    it("has a query string", () => {
+      message = "https://mobile.twitter.com/Moonbirds55_?t=yUnZi2HaVMlwaSGs_Dyzxw&s=09,2023"
+      expect(handler.twitterHandleMatch(message)).to.eq("Moonbirds55_")
+    })
+    it("receives garbage", () => {
+      message = "twat.com/NoNadaNothing"
+      expect(handler.twitterHandleMatch(message)).to.be.undefined
+      message = "twitter.com"
+      expect(handler.twitterHandleMatch(message)).to.be.undefined
+      message = "twitter.com/"
+      expect(handler.twitterHandleMatch(message)).to.be.undefined
+      message = "twitter.com/!!!"
+      expect(handler.twitterHandleMatch(message)).to.be.undefined
+    })
+  })
+
+  describe("#urlMatch", () => {
     let handler:MessageHandler
     before( () => {
       handler = new MessageHandler()
     })
-    it('happy path', () => {
-      const message = "https://twitter.com/moonbirds 2022"
-      const [twitterLink, launchDate] = handler.parseMessage(message)
-      expect(twitterLink).to.eq("https://twitter.com/moonbirds")
-      expect(launchDate).to.eq('2022')
+    it("with date ending", () => {
+      const url = "https://mobile.twitter.com/Moonbirds55_ April 5, 2023"
+      expect(handler.urlMatch(url)).to.eq("https://mobile.twitter.com/Moonbirds55_")
     })
-    it('extra spaces', () => {
-      const message = "   https://twitter.com/moonbirds      2022 "
-      const [twitterLink, launchDate] = handler.parseMessage(message)
-      expect(twitterLink).to.eq("https://twitter.com/moonbirds")
-      expect(launchDate).to.eq('2022')   
+    it("with query string and comma delimiter", () => {
+      const url = "https://twitter.com/Moonbirds55_?t=yUnZi2HaVMlwaSGs_Dyzxw&s=09,April 5, 2023"
+      expect(handler.urlMatch(url)).to.eq("https://twitter.com/Moonbirds55_?t=yUnZi2HaVMlwaSGs_Dyzxw&s=09")
     })
-    it('no launch date', () => {
-      const message = "https://twitter.com/moonbirds"
-      const [twitterLink, launchDate] = handler.parseMessage(message)
-      expect(twitterLink).to.eq("https://twitter.com/moonbirds")
-      expect(launchDate).to.eq(undefined)   
+    it("period delimiter will be included in url (unexpected!)", () => {
+      const url = "https://www.twitter.com/Moonbirds55_?t=yUnZi2HaVMlwaSGs_Dyzxw&s=09.April 5, 2023"
+      expect(handler.urlMatch(url)).to.eq("https://www.twitter.com/Moonbirds55_?t=yUnZi2HaVMlwaSGs_Dyzxw&s=09.April")
     })
-    it('garbage input', () => {
-      const message = "thisisgarbage!@#"
-      const [twitterLink, launchDate] = handler.parseMessage(message)
-      expect(twitterLink).to.eq(message)
-      expect(launchDate).to.eq(undefined)   
+  })
+
+  describe("#parseLaunchDate", () => {
+    let handler:MessageHandler
+    before( () => {
+      handler = new MessageHandler()
     })
-    it('long launch date', () => {
-      const message = "https://twitter.com/moonbirds April 15, 2023"
-      const [twitterLink, launchDate] = handler.parseMessage(message)
-      expect(twitterLink).to.eq("https://twitter.com/moonbirds")
-      expect(launchDate).to.eq("April 15, 2023")   
+    it("space delimited", () => {
+      const message = "https://twitter.com/_GoeyGeese1 2023"
+      expect(handler.parseLaunchDate(message)).to.eq("2023")
     })
-    it('delimited with comma and space', () => {
-      const message = "https://twitter.com/moonbirds, 2023"
-      const [twitterLink, launchDate] = handler.parseMessage(message)
-      expect(twitterLink).to.eq("https://twitter.com/moonbirds")
-      expect(launchDate).to.eq("2023")   
+    it("space delimited with date with comma", () => {
+      const message = "https://twitter.com/_GoeyGeese1 April 5, 2023"
+      expect(handler.parseLaunchDate(message)).to.eq("April 5, 2023")
+    })
+    it("comma delimited", () => {
+      const message = "https://twitter.com/_GoeyGeese1,2023"
+      expect(handler.parseLaunchDate(message)).to.eq("2023")
+    })
+    it("url with query string, comma delimited", () => {
+      const message = "https://mobile.twitter.com/Moonbirds55_?t=yUnZi2HaVMlwaSGs_Dyzxw&s=09,April 5, 2023"
+      expect(handler.parseLaunchDate(message)).to.eq("April 5, 2023")
+    })
+    it("period delimited", () => {
+      // this will capture what's after the period in the url
+      const message = "https://mobile.twitter.com/Moonbirds55_?t=yUnZi2HaVMlwaSGs_Dyzxw&s=09.April 5, 2023"
+      expect(handler.parseLaunchDate(message)).to.eq("5, 2023")
     })
   })
 
