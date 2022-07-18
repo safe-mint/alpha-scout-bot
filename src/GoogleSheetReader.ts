@@ -1,7 +1,7 @@
 import { google } from 'googleapis'
 import { GoogleAuth } from 'google-auth-library';
 
-const SHEET_NAME = "ML NFT Calendar - Cycle 1"
+const SHEET_NAME = "Master ML Alpha Calendar"
 
 
 export class GoogleSheetReader {
