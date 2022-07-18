@@ -24,7 +24,7 @@ export class GoogleSheetReader {
     const readData = await sheets.spreadsheets.values.get({
       auth, //auth object
       spreadsheetId, // spreadsheet id
-      range: `${SHEET_NAME}!C:C`, //range of cells to read from.
+      range: `${SHEET_NAME}!D:D`, //range of cells to read from.
     })
     const values = readData?.data?.values?.map(x => x[0]?.trim()?.toLowerCase())
     return values
